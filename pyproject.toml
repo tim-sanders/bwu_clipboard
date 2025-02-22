@@ -5,9 +5,5 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
-    "gspread>=6.1.4",
-    "streamlit>=1.42.2",
-    "oauth2client",
-    "numpy==1.26.4",
-    "pandas==1.5.3",
+
 ]
