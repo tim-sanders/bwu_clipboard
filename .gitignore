@@ -8,6 +8,7 @@ wheels/
 
 # Virtual environments
 .venv
+pyproject.toml
 uv.lock
 
 creds/gs_ts.json
