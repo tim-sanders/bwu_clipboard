@@ -1,9 +1,9 @@
-import os
+# import os
 import streamlit as st
-import gspread
-from oauth2client.service_account import ServiceAccountCredentials
-import pandas as pd
-import json
+# import gspread
+# from oauth2client.service_account import ServiceAccountCredentials
+# import pandas as pd
+# import json
 
 # Function to authenticate and connect to Google Sheets
 # def connect_to_google_sheets(json_keyfile, sheet_name, worksheet_name):
