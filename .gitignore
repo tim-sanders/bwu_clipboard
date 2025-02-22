@@ -8,6 +8,7 @@ wheels/
 
 # Virtual environments
 .venv
+uv.lock
 
 creds/gs_ts.json
 .streamlit/secrets.toml
