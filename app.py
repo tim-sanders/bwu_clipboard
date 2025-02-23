@@ -3,6 +3,9 @@ from modules.authentication import login_ui, logout_ui
 from modules.action_buttons import load_data_ui, add_random_integer_ui
 
 
+# Set the browser tab name
+st.set_page_config(page_title="Google Sheets Data Viewer")
+
 # Streamlit application
 def main():
     st.title("Google Sheets Data Viewer")
