@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import random
 from modules.google_sheets_connection import connect_to_google_sheets
+import gspread
 
 # Input fields for JSON keyfile, Google Sheets name, and worksheet name
 credentials = st.secrets["gcp_service_account"]
@@ -24,6 +25,8 @@ def load_data_ui():
             df = pd.DataFrame(data)
             st.write("Data from Google Sheets:")
             st.dataframe(df)
+        except gspread.exceptions.APIError as e:
+            st.error(f"API Error: {e.response.text}")
         except Exception as e:
             st.error(f"Error: {e}")
 

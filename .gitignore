@@ -13,4 +13,5 @@ uv.lock
 
 creds/gs_ts.json
 .streamlit/secrets.toml
+.streamlit/secrets_ts.toml
 test.py
