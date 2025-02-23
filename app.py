@@ -14,32 +14,33 @@ import streamlit as st
 #     data = sheet.get_all_records()
 #     return pd.DataFrame(data)
 
-# # Function to validate login credentials
-# def validate_login(username, password):
-#     # Replace with your own validation logic
-#     return username == "admin" and password == "password"
+# Function to validate login credentials
+def validate_login(username, password):
+    # Replace with your own validation logic
+    return username == "admin" and password == "password"
 
 # Streamlit application
 def main():
     st.title("Google Sheets Data Viewer")
 
-    # # Check if the user is logged in
-    # if "logged_in" not in st.session_state:
-    #     st.session_state.logged_in = False
+    # Check if the user is logged in
+    if "logged_in" not in st.session_state:
+        st.session_state.logged_in = False
 
-    # if not st.session_state.logged_in:
-    #     # Login form
-    #     st.subheader("Login")
-    #     username = st.text_input("Username")
-    #     password = st.text_input("Password", type="password")
-    #     if st.button("Login"):
-    #         if validate_login(username, password):
-    #             st.session_state.logged_in = True
-    #             st.success("Login successful!")
-    #             st.rerun()
-    #         else:
-    #             st.error("Invalid username or password")
-    # else:
+    if not st.session_state.logged_in:
+        # Login form
+        st.subheader("Login")
+        username = st.text_input("Username")
+        password = st.text_input("Password", type="password")
+        if st.button("Login"):
+            if validate_login(username, password):
+                st.session_state.logged_in = True
+                st.success("Login successful!")
+                st.rerun()
+            else:
+                st.error("Invalid username or password")
+    else:
+        st.title("Logged in")
     #     # Input fields for JSON keyfile, Google Sheets name, and worksheet name
     #     if os.getenv("IS_LOCAL"):
     #         credentials = "creds/gs_ts.json"
@@ -57,10 +58,10 @@ def main():
     #         except Exception as e:
     #             st.error(f"Error: {e}")
         
-    #     if st.button("Logout"):
-    #         st.session_state.logged_in = False
-    #         st.success("Logged out successfully!")
-    #         st.rerun()
+        if st.button("Logout"):
+            st.session_state.logged_in = False
+            st.success("Logged out successfully!")
+            st.rerun()
 
 if __name__ == "__main__":
     main()
