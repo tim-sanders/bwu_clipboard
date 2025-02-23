@@ -1,18 +1,18 @@
-# import os
+import os
 import streamlit as st
-# import gspread
-# from oauth2client.service_account import ServiceAccountCredentials
-# import pandas as pd
-# import json
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
+import pandas as pd
+import json
 
 # Function to authenticate and connect to Google Sheets
-# def connect_to_google_sheets(json_keyfile, sheet_name, worksheet_name):
-#     scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-#     creds = ServiceAccountCredentials.from_json_keyfile_name(json_keyfile, scope)
-#     client = gspread.authorize(creds)
-#     sheet = client.open(sheet_name).worksheet(worksheet_name)
-#     data = sheet.get_all_records()
-#     return pd.DataFrame(data)
+def connect_to_google_sheets(json_keyfile, sheet_name, worksheet_name):
+    scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+    creds = ServiceAccountCredentials.from_json_keyfile_name(json_keyfile, scope)
+    client = gspread.authorize(creds)
+    sheet = client.open(sheet_name).worksheet(worksheet_name)
+    data = sheet.get_all_records()
+    return pd.DataFrame(data)
 
 # Function to validate login credentials
 def validate_login(username, password):
@@ -41,22 +41,22 @@ def main():
                 st.error("Invalid username or password")
     else:
         st.title("Logged in")
-    #     # Input fields for JSON keyfile, Google Sheets name, and worksheet name
-    #     if os.getenv("IS_LOCAL"):
-    #         credentials = "creds/gs_ts.json"
-    #     else:
-    #         credentials = json.loads(st.secrets["gcp_service_account"])
+        # Input fields for JSON keyfile, Google Sheets name, and worksheet name
+        if os.getenv("IS_LOCAL"):
+            credentials = "creds/gs_ts.json"
+        else:
+            credentials = json.loads(st.secrets["gcp_service_account"])
                 
-    #     sheet_name = "Ski 25 - Via Lattea"
-    #     worksheet_name = "test"
+        sheet_name = "Ski 25 - Via Lattea"
+        worksheet_name = "test"
 
-    #     if st.button("Load Data"):
-    #         try:
-    #             df = connect_to_google_sheets(credentials, sheet_name, worksheet_name)
-    #             st.write("Data from Google Sheets:")
-    #             st.dataframe(df)
-    #         except Exception as e:
-    #             st.error(f"Error: {e}")
+        if st.button("Load Data"):
+            try:
+                df = connect_to_google_sheets(credentials, sheet_name, worksheet_name)
+                st.write("Data from Google Sheets:")
+                st.dataframe(df)
+            except Exception as e:
+                st.error(f"Error: {e}")
         
         if st.button("Logout"):
             st.session_state.logged_in = False
