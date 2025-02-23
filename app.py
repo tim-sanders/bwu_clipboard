@@ -2,6 +2,7 @@ import streamlit as st
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 import pandas as pd
+import random
 
 # Function to authenticate and connect to Google Sheets
 def connect_to_google_sheets(credentials_dict, sheet_name, worksheet_name):
@@ -9,13 +10,17 @@ def connect_to_google_sheets(credentials_dict, sheet_name, worksheet_name):
     creds = ServiceAccountCredentials.from_json_keyfile_dict(credentials_dict, scope)
     client = gspread.authorize(creds)
     sheet = client.open(sheet_name).worksheet(worksheet_name)
-    data = sheet.get_all_records()
-    return pd.DataFrame(data)
+    return sheet
 
 # Function to validate login credentials
 def validate_login(username, password):
     # Replace with your own validation logic
     return username == st.secrets["APP_USERNAME"] and password == st.secrets["APP_PASSWORD"]
+
+def insert_random_integer(sheet):
+    random_integer = random.randint(100, 999)
+    sheet.append_row([random_integer])
+    return random_integer
 
 # Streamlit application
 def main():
@@ -46,9 +51,21 @@ def main():
 
         if st.button("Load Data"):
             try:
-                df = connect_to_google_sheets(credentials, sheet_name, worksheet_name)
+                sheet = connect_to_google_sheets(credentials, sheet_name, worksheet_name)
+                data = sheet.get_all_records()
+                df = pd.DataFrame(data)
                 st.write("Data from Google Sheets:")
                 st.dataframe(df)
+            except Exception as e:
+                st.error(f"Error: {e}")
+
+        if st.button("Add Random Integer"):
+            try:
+                # Read credentials from Streamlit secrets
+                credentials = st.secrets["gcp_service_account"]
+                sheet = connect_to_google_sheets(credentials, sheet_name, worksheet_name)
+                random_integer = insert_random_integer(sheet)
+                st.success(f"Inserted random integer: {random_integer}")
             except Exception as e:
                 st.error(f"Error: {e}")
         
