@@ -17,7 +17,7 @@ def connect_to_google_sheets(json_keyfile, sheet_name, worksheet_name):
 # Function to validate login credentials
 def validate_login(username, password):
     # Replace with your own validation logic
-    return username == "admin" and password == "password"
+    return username == st.secrets["APP_USERNAME"] and password == st.secrets["APP_PASSWORD"]
 
 # Streamlit application
 def main():
@@ -41,27 +41,28 @@ def main():
                 st.error("Invalid username or password")
     else:
         st.title("Logged in")
-        # Input fields for JSON keyfile, Google Sheets name, and worksheet name
-        if os.getenv("IS_LOCAL"):
-            credentials = "creds/gs_ts.json"
-        else:
-            credentials = json.loads(st.secrets["gcp_service_account"])
+        # # Input fields for JSON keyfile, Google Sheets name, and worksheet name
+        # if os.getenv("IS_LOCAL"):
+        #     # credentials = "creds/gs_ts.json"
+        #     credentials = json.loads(st.secrets["gcp_service_account"])
+        # else:
+        #     credentials = json.loads(st.secrets["gcp_service_account"])
                 
-        sheet_name = "Ski 25 - Via Lattea"
-        worksheet_name = "test"
+        # sheet_name = "Ski 25 - Via Lattea"
+        # worksheet_name = "test"
 
-        if st.button("Load Data"):
-            try:
-                df = connect_to_google_sheets(credentials, sheet_name, worksheet_name)
-                st.write("Data from Google Sheets:")
-                st.dataframe(df)
-            except Exception as e:
-                st.error(f"Error: {e}")
+        # if st.button("Load Data"):
+        #     try:
+        #         df = connect_to_google_sheets(credentials, sheet_name, worksheet_name)
+        #         st.write("Data from Google Sheets:")
+        #         st.dataframe(df)
+        #     except Exception as e:
+        #         st.error(f"Error: {e}")
         
-        if st.button("Logout"):
-            st.session_state.logged_in = False
-            st.success("Logged out successfully!")
-            st.rerun()
+        # if st.button("Logout"):
+        #     st.session_state.logged_in = False
+        #     st.success("Logged out successfully!")
+        #     st.rerun()
 
 if __name__ == "__main__":
     main()
