@@ -11,7 +11,7 @@ wheels/
 pyproject.toml
 uv.lock
 
-creds/gs_ts.json
+creds
 .streamlit/secrets.toml
 .streamlit/secrets_ts.toml
 test.py
