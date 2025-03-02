@@ -74,11 +74,7 @@ def save_match_data(match_data):
 
 def record_match_ui():
     """
-    Display UI for recording match data.
-    
-    This function creates a form in the Streamlit app that allows the user to select
-    a tournament, enter opponent info, select players for a point, and record the outcome.
-    When the form is submitted, it adds the match data to the matches tab in Google Sheets.
+    Display UI for recording match data, optimized for mobile devices.
     """
     st.header("Record Match")
     
@@ -93,50 +89,55 @@ def record_match_ui():
             "score_against": 0
         }
     
-    # Tournament and opponent selection
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        # Get list of tournaments
-        try:
-            tournaments = get_tournaments()
-            # Tournament selection dropdown
-            tournament_name = st.selectbox(
-                "Select Tournament",
-                tournaments,
-                index=tournaments.index(st.session_state.match_info["tournament_name"]) if st.session_state.match_info["tournament_name"] in tournaments else 0
-            )
-        except Exception as e:
-            st.error(f"Error loading tournaments: {e}")
-            return
-    
-    with col2:
-        # Opponent name input
-        opponent = st.text_input(
-            "Opponent Name",
-            value=st.session_state.match_info["opponent"] if st.session_state.match_info["opponent"] else ""
+    # Tournament and opponent selection - stacked for mobile
+    # Get list of tournaments
+    try:
+        tournaments = get_tournaments()
+        # Tournament selection dropdown
+        tournament_name = st.selectbox(
+            "Select Tournament",
+            tournaments,
+            index=tournaments.index(st.session_state.match_info["tournament_name"]) if st.session_state.match_info["tournament_name"] in tournaments else 0
         )
+    except Exception as e:
+        st.error(f"Error loading tournaments: {e}")
+        return
+    
+    # Opponent name input
+    opponent = st.text_input(
+        "Opponent Name",
+        value=st.session_state.match_info["opponent"] if st.session_state.match_info["opponent"] else ""
+    )
     
     # Update session state with tournament and opponent
     if tournament_name != st.session_state.match_info["tournament_name"] or opponent != st.session_state.match_info["opponent"]:
         st.session_state.match_info["tournament_name"] = tournament_name
         st.session_state.match_info["opponent"] = opponent
     
-    # Display current match info
-    st.subheader("Current Match")
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        st.write(f"**Tournament:** {st.session_state.match_info['tournament_name']}")
-    with col2:
-        st.write(f"**Opponent:** {st.session_state.match_info['opponent']}")
-    with col3:
-        st.write(f"**Date:** {st.session_state.match_info['date']}")
+    # Display current match info in a compact card
+    st.markdown("""
+    <style>
+    .match-info-card {
+        background-color: #f0f2f6;
+        border-radius: 5px;
+        padding: 10px;
+        margin-bottom: 10px;
+    }
+    .match-score {
+        font-size: 18px;
+        font-weight: bold;
+    }
+    </style>
+    """, unsafe_allow_html=True)
     
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        st.write(f"**Point:** {st.session_state.match_info['point_number']}")
-    with col2:
-        st.write(f"**Score:** {st.session_state.match_info['score_for']} - {st.session_state.match_info['score_against']}")
+    with st.container():
+        st.markdown(f"""
+        <div class="match-info-card">
+            <div class="match-score">{st.session_state.match_info['score_for']} - {st.session_state.match_info['score_against']}</div>
+            <p><b>Point:</b> {st.session_state.match_info['point_number']} | 
+            <b>Date:</b> {st.session_state.match_info['date']}</p>
+        </div>
+        """, unsafe_allow_html=True)
     
     # Get tournament roster
     if st.session_state.match_info["tournament_name"]:
@@ -148,61 +149,85 @@ def record_match_ui():
             
             # Form for recording a point
             with st.form(key='record_point_form'):
-                st.subheader(f"Select Players for Point {st.session_state.match_info['point_number']}")
+                st.subheader(f"Point {st.session_state.match_info['point_number']}")
                 
-                # Initialize a list to store player selections
+                # Group players by line for better organization
+                st.markdown("### Select exactly 7 players")
+                
+                # Create player selection with line info
+                all_lines = sorted(roster_df['line'].unique())
+                
+                # Track selected players across all lines
+                selected_player_names = []
+                
+                # For storing complete player info when selected
                 player_selections = []
                 
-                # Display each player with selection options
-                for index, row in roster_df.iterrows():
-                    player_name = row.get('player_name', f"Player {index + 1}")
-                    line = row.get('line', "")
-                    position = row.get('position', "")
-                    
-                    # Create a container for each player
-                    col1, col2, col3, col4 = st.columns([1, 2, 1, 1])
-                    
-                    with col1:
-                        selected = st.checkbox(
-                            "Select", 
-                            key=f"select_player_{player_name}_{st.session_state.match_info['point_number']}"
+                # Show players grouped by line
+                for line in all_lines:
+                    with st.expander(f"Line: {line}", expanded=True):
+                        line_players = roster_df[roster_df['line'] == line]
+                        
+                        # Create a multiselect for this line's players
+                        line_player_options = []
+                        line_player_labels = {}
+                        
+                        # Create clear labels with position info
+                        for _, player in line_players.iterrows():
+                            player_name = player.get('player_name', "")
+                            position = player.get('position', "")
+                            display_name = f"{player_name} ({position})"
+                            line_player_options.append(player_name)
+                            line_player_labels[player_name] = display_name
+                        
+                        # Custom format for selectbox options
+                        line_selected_players = st.multiselect(
+                            f"Select players",
+                            options=line_player_options,
+                            format_func=lambda x: line_player_labels[x],
+                            key=f"line_{line}_players"
                         )
-                    
-                    with col2:
-                        st.write(f"**{player_name}**")
-                    
-                    with col3:
-                        st.write(f"Line: {line}")
-                    
-                    with col4:
-                        st.write(f"Position: {position}")
-                    
-                    # Add player info to selections
-                    if selected:
-                        player_selections.append({
-                            'player_name': player_name,
-                            'line': line,
-                            'position': position,
-                            'selected': selected
-                        })
+                        
+                        # Add selected players to our tracking lists
+                        selected_player_names.extend(line_selected_players)
+                        
+                        # Get complete info for selected players
+                        for player_name in line_selected_players:
+                            player_info = line_players[line_players['player_name'] == player_name].iloc[0]
+                            player_selections.append({
+                                'player_name': player_name,
+                                'line': player_info['line'],
+                                'position': player_info['position'],
+                                'selected': True
+                            })
                 
-                # Point outcome
-                st.subheader("Point Outcome")
-                col1, col2 = st.columns(2)
+                # Show counter for selected players
+                selected_count = len(selected_player_names)
+                st.write(f"**{selected_count}/7** players selected")
                 
-                with col1:
-                    point_scored = st.radio(
-                        "Did your team score?",
-                        options=["Yes", "No"],
-                        horizontal=True
-                    )
+                # Point outcome - simple UI
+                st.markdown("### Point Outcome")
+                point_scored = st.radio(
+                    "Did your team score?",
+                    options=["Yes", "No"],
+                    horizontal=True
+                )
                 
-                # Submit button
-                submit_button = st.form_submit_button(label='Save Point')
+                # Submit button - make it more prominent
+                submit_button = st.form_submit_button(label='SAVE POINT', use_container_width=True)
+            
+            # Show current selection summary outside the form
+            if selected_player_names:
+                with st.expander("Selected Players", expanded=False):
+                    # Create a neat table for selected players
+                    st.table(pd.DataFrame([
+                        {"Player": p['player_name'], "Line": p['line'], "Position": p['position']}
+                        for p in player_selections
+                    ]))
             
             # Process form submission
             if submit_button:
-                selected_count = len(player_selections)
+                selected_count = len(selected_player_names)
                 
                 if not st.session_state.match_info["opponent"]:
                     st.error("Please enter an opponent name")
@@ -215,10 +240,10 @@ def record_match_ui():
                 # Update scores
                 if point_scored == "Yes":
                     st.session_state.match_info["score_for"] += 1
-                    point_scored_value = "Yes"  # Changed from boolean to string to match sheet expectations
+                    point_scored_value = "Yes"
                 else:
                     st.session_state.match_info["score_against"] += 1
-                    point_scored_value = "No"  # Changed from boolean to string to match sheet expectations
+                    point_scored_value = "No"
                 
                 # Prepare data for the matches sheet
                 match_data = []
@@ -231,7 +256,7 @@ def record_match_ui():
                         player['player_name'],
                         player['line'],
                         player['position'],
-                        point_scored_value,  # Using the string value now
+                        point_scored_value,
                         st.session_state.match_info["score_for"],
                         st.session_state.match_info["score_against"],
                         f"{st.session_state.match_info['score_for']}-{st.session_state.match_info['score_against']}"
@@ -240,7 +265,7 @@ def record_match_ui():
                 try:
                     success = save_match_data(match_data)
                     if success:
-                        st.success(f"Point {st.session_state.match_info['point_number']} recorded successfully")
+                        st.success(f"✅ Point {st.session_state.match_info['point_number']} recorded!")
                         # Increment point number for next point
                         st.session_state.match_info["point_number"] += 1
                         # Force rerun to update the UI
@@ -249,7 +274,6 @@ def record_match_ui():
                         st.error("Failed to save match data")
                 except gspread.exceptions.APIError as e:
                     st.error(f"API Error: {e.response.text}")
-                    st.error(f"API Response: {e.response}")  # Add this for more detailed error info
                 except Exception as e:
                     st.error(f"Error: {e}")
                 
@@ -257,8 +281,8 @@ def record_match_ui():
             st.error(f"Error loading tournament roster: {e}")
             return
     
-    # Option to start a new match
-    if st.button("Start New Match"):
+    # Option to start a new match - make button full width
+    if st.button("Start New Match", use_container_width=True):
         # Reset match info except for tournament name and opponent
         st.session_state.match_info = {
             "tournament_name": st.session_state.match_info["tournament_name"],
