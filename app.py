@@ -1,9 +1,7 @@
 import streamlit as st
 from modules.authentication import login_ui, logout_ui
-from modules.action_buttons import load_roster_ui
 from modules.add_tournament import add_tournament_ui
-# Import additional modules as needed
-# from modules.record_match import record_match_ui
+from modules.record_match import record_match_ui
 
 # Set the browser tab name
 st.set_page_config(page_title="BWU Clipboard", layout="wide")
@@ -44,9 +42,7 @@ def main():
             add_tournament_ui()
         
         elif st.session_state.current_page == "Record Match":
-            st.header("Record Match")
-            st.info("Record match functionality will be implemented here")
-            # record_match_ui()  # Uncomment when this function is available
+            record_match_ui()
 
 if __name__ == "__main__":
     main()
