@@ -17,7 +17,7 @@ def main():
         st.session_state.logged_in = False
     
     if "current_page" not in st.session_state:
-        st.session_state.current_page = "Add Tournament"
+        st.session_state.current_page = "Record Match"
     
     if not st.session_state.logged_in:
         login_ui()
