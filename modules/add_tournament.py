@@ -11,6 +11,7 @@ tournament_tab_name = st.secrets["TOURNAMENT_TAB_NAME"]
 roster_tab_name = st.secrets["ROSTER_TAB_NAME"]
 tournament_roster_tab_name = st.secrets["TOURNAMENT_ROSTER_TAB_NAME"]
 
+
 def get_roster():
     """
     Get the club roster from the roster tab in Google Sheets.
@@ -24,6 +25,7 @@ def get_roster():
         return pd.DataFrame(data)
     except Exception as e:
         raise e
+
 
 def add_tournament(tournament_name, selected_players):
     """
@@ -76,6 +78,7 @@ def add_tournament(tournament_name, selected_players):
         return True
     except Exception as e:
         raise e
+
 
 def add_tournament_ui():
     """

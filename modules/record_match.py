@@ -72,6 +72,7 @@ def save_match_data(match_data):
     except Exception as e:
         raise e
 
+
 def record_match_ui():
     """
     Display UI for recording match data, optimized for mobile devices.

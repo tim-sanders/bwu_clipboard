@@ -14,6 +14,7 @@ def validate_login(username, password):
     """
     return username == st.secrets["APP_USERNAME"] and password == st.secrets["APP_PASSWORD"]
 
+
 def login_ui():
     """
     Display the login UI and handle the login process.
@@ -31,6 +32,7 @@ def login_ui():
             st.rerun()
         else:
             st.error("Invalid username or password")
+
 
 def logout_ui():
     """
